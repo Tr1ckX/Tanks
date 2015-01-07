@@ -85,7 +85,4 @@ eurecaServer.exports.handleKeys = function (keys) {
 		clients[c].laststate = keys;
 	}
 }
-app.set('port', (process.env.PORT || 8000));
-app.listen(app.get('port'), function() {
-  console.log("Node app is running at host:" + app.get('port'));
-});
+server.listen(8000);
