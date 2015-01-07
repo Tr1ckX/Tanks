@@ -2,6 +2,7 @@ var express = require('express')
   , app = express(app)
   , server = require('http').createServer(app);
 
+app.set('port', (process.env.PORT || 8000));
 // serve static files from the current directory
 app.use(express.static(__dirname));
 
@@ -17,8 +18,9 @@ var eurecaServer = new EurecaServer({allow:['setId', 'spawnEnemy', 'kill', 'upda
 //attach eureca.io to our http server
 eurecaServer.attach(server);
 
-
-
+// app.get('/', function(request, response) {
+//   response.sendfile('index.html');
+// });
 
 //eureca.io provides events to detect clients connect/disconnect
 
@@ -85,7 +87,7 @@ eurecaServer.exports.handleKeys = function (keys) {
 		clients[c].laststate = keys;
 	}
 }
-app.set('port', (process.env.PORT || 8000));
-app.listen(app.get('port'), function() {
+
+server.listen(app.get('port'), function() {
   console.log("Node app is running at host:" + app.get('port'));
 });
