@@ -3,7 +3,7 @@ var express = require('express')
   , server = require('http').createServer(app);
 
 // serve static files from the current directory
-app.use(express.static(__dirname + '/public'));
+app.use(express.static(__dirname));
 
 //we'll keep clients data here
 var clients = {};
