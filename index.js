@@ -2,7 +2,6 @@ var express = require('express')
   , app = express(app)
   , server = require('http').createServer(app);
 
-app.set('port', (process.env.PORT || 8000));
 // serve static files from the current directory
 app.use(express.static(__dirname));
 
@@ -88,6 +87,11 @@ eurecaServer.exports.handleKeys = function (keys) {
 	}
 }
 
-server.listen(app.get('port'), function() {
-  console.log("Node app is running at host:" + app.get('port'));
+app.get('/', function(request, response) {
+  response.sendfile('index.html');
+});
+
+var port = process.env.PORT || 8000;
+server.listen(port, function() {
+  console.log("listening on port" + port);
 });
