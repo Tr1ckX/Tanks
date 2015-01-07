@@ -5,14 +5,12 @@ var socket = function(io) {
   io.on('connection', function(socket){
     console.log(socket.id + ' connected');
     clients[socket.id] = { id: socket.id };
-    console.log(clients);
     socket.emit('user joined', socket.id);
 
     socket.on('disconnect', function() {
+      io.emit('kill', socket.id);
       delete clients[socket.id];
       console.log(socket.id + ' disconnected');
-      console.log(clients);
-      socket.emit('kill', socket.id);
     });
 
     socket.on('handshake', function() {
@@ -26,8 +24,8 @@ var socket = function(io) {
     });
 
     socket.on('handleKeys', function(keys) {
-      io.emit('updateState', socket.id, keys);
-      clients[socket.id].laststate = keys;
+        io.emit('updateState', socket.id, keys);
+        clients[socket.id].laststate = keys;
     });
 
   });
