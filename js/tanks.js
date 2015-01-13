@@ -1,4 +1,4 @@
-var socket = io.connect('/');
+var socket = io.connect();
 
 var myId=0;
 
@@ -240,6 +240,7 @@ function create (){
 		console.log('game.create finished');
 	};
 };
+
 function removeLogo ()
 {
   game.input.onDown.remove(removeLogo, this);
