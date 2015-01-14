@@ -141,6 +141,13 @@ Tank.prototype.fire = function(target) {
   }
 }
 
+Tank.prototype.kill = function() {
+  this.alive = false;
+  this.tank.kill();
+  this.turret.kill();
+  this.shadow.kill();
+}
+
 function bulletHitPlayer (tank, bullet) {
 
   bullet.kill();
@@ -210,7 +217,7 @@ function create(){
 
 function update ()
 {
-  console.log('update');
+  //console.log('update');
   player.input.left = cursors.left.isDown;
   player.input.right = cursors.right.isDown;
   player.input.up = cursors.up.isDown;
@@ -277,6 +284,7 @@ socket.on('updateState', function(id, state) {
 });
 
 socket.on('deleteDisconnected', function(id){
+  tanksList[id].kill();
   delete tanksList[id];
 });
 
