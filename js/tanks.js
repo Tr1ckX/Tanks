@@ -283,9 +283,6 @@ function update ()
 			}
 		}
   }
-	socket.on('dc', function(disconnectedId){
-		console.log(disconntectedId + ' disconnected');
-	});
 }
 
 function bulletHitPlayer (tank, bullet)
@@ -317,13 +314,6 @@ socket.on('updateState', function(id, state) {
 		tanksList[id].tank.angle = state.angle;
 		tanksList[id].turret.rotation = state.rot;
 		tanksList[id].update();
-	}
-});
-
-socket.on('kill', function(id) {
-	if (tanksList[id]) {
-		tanksList[id].kill();
-		console.log('killing ' + id);
 	}
 });
 

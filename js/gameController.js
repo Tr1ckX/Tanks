@@ -11,7 +11,7 @@ var socket = function(io) {
     // setInterval(function() { console.log('-------clients hash--------')}, 3000);
     // setInterval(function() { console.log(clients)}, 3000);
 
-    socket.on('handshake', function(senderId){
+    socket.on('handshake', function(){
       for (var c in clients)
       {
         var x = clients[c].laststate ? clients[c].laststate.x:  0;
@@ -21,16 +21,17 @@ var socket = function(io) {
         console.log(cString);
       }
     });
-    //
-    // socket.on('handleKeys', function(keys) {
-    //     var socketIdString = socket.id.toString();
-    //     io.emit('updateState', socketIdString, keys);
-    //     clients[socket.id].laststate = keys;
-    // });
+
+    socket.on('playerDataToServer', function(state) {
+        var socketIdString = socket.id.toString();
+        clients[socket.id].laststate = state;
+        io.emit('updateState', socketIdString, state);
+    });
 
     socket.on('disconnect', function() {
       console.log(socket.id + ' disconnected');
       var socketIdString = socket.id.toString();
+      io.emit('deleteDisconnected', socketIdString);
       delete clients[socket.id];
     });
   });

@@ -83,14 +83,9 @@ Tank.prototype.update = function() {
       this.input.angle = this.tank.angle;
       this.input.rot = this.turret.rotation;
 
-
-      //eurecaServer.handleKeys(this.input);
-
+      socket.emit('playerDataToServer', this.input);
     }
   }
-
-  //cursor value is now updated by eurecaClient.exports.updateState method
-
 
   if (this.cursor.left)
   {
@@ -117,8 +112,6 @@ Tank.prototype.update = function() {
     this.fire({x:this.cursor.tx, y:this.cursor.ty});
   }
 
-
-
   if (this.currentSpeed > 0)
   {
     game.physics.arcade.velocityFromRotation(this.tank.rotation, this.currentSpeed, this.tank.body.velocity);
@@ -127,9 +120,6 @@ Tank.prototype.update = function() {
   {
     game.physics.arcade.velocityFromRotation(this.tank.rotation, 0, this.tank.body.velocity);
   }
-
-
-
 
   this.shadow.x = this.tank.x;
   this.shadow.y = this.tank.y;
@@ -273,6 +263,21 @@ socket.on('spawn enemy', function(k, x, y){
     console.log(k + ' added');
     console.log(tanksList);
   }
+});
+
+socket.on('updateState', function(id, state) {
+  if (tanksList[id])  {
+    tanksList[id].cursor = state;
+    tanksList[id].tank.x = state.x;
+    tanksList[id].tank.y = state.y;
+    tanksList[id].tank.angle = state.angle;
+    tanksList[id].turret.rotation = state.rot;
+    tanksList[id].update();
+  }
+});
+
+socket.on('deleteDisconnected', function(id){
+  delete tanksList[id];
 });
 
 function render (){};
