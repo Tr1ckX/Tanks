@@ -41,4 +41,4 @@ var socket = function(io) {
 module.exports = socket;
 
 
-// io.to('client_address').emit('id','message');
+// io.to('client_address').emit('matcher','optional data');

@@ -27,6 +27,8 @@ ThePlayer = function (index, game, player) {
   this.game = game;
   this.health = 7;
   this.player = player;
+
+  // our bullet group
   this.bullets = game.add.group();
   this.bullets.enableBody = true;
   this.bullets.physicsBodyType = Phaser.Physics.ARCADE;
@@ -225,7 +227,6 @@ function create() {
 }
 
 function update () {
-  //console.log('update');
   player.input.left = cursors.left.isDown;
   player.input.right = cursors.right.isDown;
   player.input.up = cursors.up.isDown;
@@ -239,12 +240,10 @@ function update () {
 
   for (var i in tanksList)
   {
-    if (!tanksList[i]) continue;
     var curBullets = tanksList[i].bullets;
     var curTank = tanksList[i].tank;
     for (var j in tanksList)
     {
-      if (!tanksList[j]) continue;
       if (j!=i)
       {
         var targetTank = tanksList[j].tank;
@@ -266,7 +265,9 @@ function removeLogo () {
 
 function bulletHitPlayer (tank, bullet) {
   bullet.kill();
-  tank.damage();
+  if(tank.id == myId){
+    player.damage();
+  }
 }
 
 socket.on('user joined', function(id) {
