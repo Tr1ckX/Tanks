@@ -5,27 +5,27 @@ var game;
 var tank;
 var tanksList = {};
 
-Tank = function (index, game, player) // tank class
-{
+ThePlayer = function (index, game, player) {
+
   this.cursor = {
     left:false,
     right:false,
     up:false,
     fire:false
-  }
+  };
 
   this.input = {
     left:false,
     right:false,
     up:false,
     fire:false
-  }
+  };
 
   var x = 0;
   var y = 0;
 
   this.game = game;
-  this.health = 30;
+  this.health = 7;
   this.player = player;
   this.bullets = game.add.group();
   this.bullets.enableBody = true;
@@ -38,7 +38,7 @@ Tank = function (index, game, player) // tank class
 
 
   this.currentSpeed =0;
-  this.fireRate = 500;
+  this.fireRate = 750;
   this.nextFire = 0;
   this.alive = true;
 
@@ -61,7 +61,7 @@ Tank = function (index, game, player) // tank class
   game.physics.arcade.velocityFromRotation(this.tank.rotation, 0, this.tank.body.velocity);
 };
 
-Tank.prototype.update = function() {
+ThePlayer.prototype.update = function() {
 
   var inputChanged = (
     this.cursor.left != this.input.left ||
@@ -129,7 +129,7 @@ Tank.prototype.update = function() {
   this.turret.y = this.tank.y;
 };
 
-Tank.prototype.fire = function(target) {
+ThePlayer.prototype.fire = function(target) {
   if (!this.alive) return;
   if (this.game.time.now > this.nextFire && this.bullets.countDead() > 0)
   {
@@ -139,25 +139,34 @@ Tank.prototype.fire = function(target) {
 
     bullet.rotation = this.game.physics.arcade.moveToObject(bullet, target, 500);
   }
-}
+};
 
-Tank.prototype.kill = function() {
-  this.alive = false;
+ThePlayer.prototype.kill = function() {
   this.tank.kill();
   this.turret.kill();
   this.shadow.kill();
-}
-
-function bulletHitPlayer (tank, bullet) {
-
-  bullet.kill();
-}
-
-function createGame(){
-  game = new Phaser.Game(800, 600, Phaser.AUTO, 'phaser-example', { preload: preload, create: create, update: update, render: render });
 };
 
-function preload(){
+ThePlayer.prototype.damage = function() {
+
+  this.health -= 1;
+
+  if (this.health <= 0)
+  {
+    this.alive = false;
+
+    this.kill();
+
+    var explosionAnimation = explosions.getFirstExists(false);
+    explosionAnimation.reset(tank.x, tank.y);
+    explosionAnimation.play('kaboom', 30, false, true);
+  }
+};
+function createGame() {
+  game = new Phaser.Game(800, 600, Phaser.AUTO, 'phaser-example', { preload: preload, create: create, update: update, render: render });
+}
+
+function preload() {
   console.log('preload');
   game.load.atlas('tank', 'assets/tanks.png', 'assets/tanks.json');
   game.load.atlas('enemy', 'assets/enemy-tanks.png', 'assets/tanks.json');
@@ -165,9 +174,9 @@ function preload(){
   game.load.image('bullet', 'assets/bullet.png');
   game.load.image('earth', 'assets/scorched_earth.png');
   game.load.spritesheet('kaboom', 'assets/explosion.png', 64, 64, 23);
-};
+}
 
-function create(){
+function create() {
   console.log('game create started');
   //  Resize our game world to be a 2000 x 2000 square
   game.world.setBounds(-1000, -1000, 2000, 2000);
@@ -177,7 +186,7 @@ function create(){
   land = game.add.tileSprite(0, 0, 800, 600, 'earth');
   land.fixedToCamera = true;
 
-  player = new Tank(myId, game, tank);
+  player = new ThePlayer(myId, game, tank);
   tanksList[myId] = player;
   tank = player.tank;
   turret = player.turret;
@@ -213,10 +222,9 @@ function create(){
   setTimeout(removeLogo, 1000);
   console.log('game.create finished');
   socket.emit('handshake');
-};
+}
 
-function update ()
-{
+function update () {
   //console.log('update');
   player.input.left = cursors.left.isDown;
   player.input.right = cursors.right.isDown;
@@ -251,9 +259,14 @@ function update ()
   }
 }
 
-function removeLogo (){
+function removeLogo () {
   game.input.onDown.remove(removeLogo, this);
   logo.kill();
+}
+
+function bulletHitPlayer (tank, bullet) {
+  bullet.kill();
+  tank.damage();
 }
 
 socket.on('user joined', function(id) {
@@ -265,7 +278,7 @@ socket.on('user joined', function(id) {
 socket.on('spawn enemy', function(k, x, y){
   console.log('spawn enemy message arrived');
   if(!(k in tanksList)){
-    var tnk = new Tank(k, game, tank);
+    var tnk = new ThePlayer(k, game, tank);
     tanksList[k] = tnk;
     console.log(k + ' added');
     console.log(tanksList);
@@ -288,4 +301,6 @@ socket.on('deleteDisconnected', function(id){
   delete tanksList[id];
 });
 
-function render (){};
+function render (){
+  game.debug.text('HP: ' + player.health, 710, 32);
+}

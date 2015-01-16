@@ -1,6 +1,6 @@
 var socket = function(io) {
 
-  var clients = {}
+  var clients = {};
 
   io.on('connection', function(socket){
     var socketIdString = socket.id.toString();
